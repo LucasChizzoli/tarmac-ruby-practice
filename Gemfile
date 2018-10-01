@@ -1,0 +1,10 @@
+source "https://rubygems.org"
+
+gem "sinatra"
+gem "activerecord"
+gem "sinatra-activerecord"
+gem "sinatra-contrib"
+gem "pg"
+gem "rspec"
+gem "rack-reducer"
+gem "will_paginate", "~> 3.1.0" 

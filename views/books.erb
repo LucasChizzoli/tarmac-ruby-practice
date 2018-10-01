@@ -1,0 +1,8 @@
+<h3>Welcome to Sinatra BOOKS!</h3>
+<ul>
+<% @books.each do |model| %>
+  <li>
+    <%= model.title %>
+  </li>
+<% end %>
+</ul>
