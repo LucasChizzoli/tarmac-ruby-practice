@@ -3,6 +3,7 @@ require 'sinatra/activerecord'
 require 'sinatra/namespace'
 require './config/environments'
 require './models/book'
+require './utils/status_codes'
 require './utils/parser'
 require './utils/book_validation'
 require 'will_paginate'
@@ -15,39 +16,45 @@ DEFAULT_LIMIT = 5
 get '/books' do 
   @page = params[:page] || DEFAULT_PAGE
   @limit = params[:limit] || DEFAULT_LIMIT
-  Book.paginate(:page => @page, :per_page => @limit).to_json 
+  @books = Book.paginate(:page => @page, :per_page => @limit)
+  {
+    page: @page,
+    limit: @limit,
+    data: @books
+  }.to_json
 end
   
 post '/books' do
   @book = Book.new(Parser.parse(request.body.read))
-  halt(400, { message: 'Invalid Data' }.to_json ) unless BookValidation.validate(@book)
+  puts @book
+  halt(StatusCodes::STATUS_BAD_REQUEST, { message: 'Invalid Data' }.to_json ) unless BookValidation.validate(@book)
   if @book.save
-    @book
-    status 201
+    status StatusCodes::STATUS_OK
+    return @book.id.to_json
   else
-    status 400
+    status StatusCodes::STATUS_BAD_REQUEST
   end
 end
   
 get '/books/:id' do |id|
   @book = Book.where(id: id).first
-  halt(404, { message: 'Book Not Found' }.to_json) unless @book
+  halt(StatusCodes::STATUS_NOT_FOUND, { message: 'Book Not Found' }.to_json) unless @book
   @book.to_json
 end
   
 delete '/books/:id' do |id|
   @book = Book.where(id: id).first
   @book.destroy if @book
-  status 204
+  status StatusCodes::STATUS_OK
 end
   
 put '/books/:id' do |id|
   @book = Book.where(id: id).first
-  halt(404, { message: 'Book Not Found' }.to_json) unless @book
+  halt(StatusCodes::STATUS_NOT_FOUND, { message: 'Book Not Found' }.to_json) unless @book
   if @book.update_attributes(Parser.parse(request.body.read))
     @book
   else
-    status 422
+    status StatusCodes::STATUS_UNPROCESSABLE_ENTITY
     @book
   end
 end

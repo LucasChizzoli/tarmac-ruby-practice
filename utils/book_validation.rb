@@ -1,5 +1,4 @@
-require 'date'
-require 'pry'
+require 'time'
 
 class BookValidation
 

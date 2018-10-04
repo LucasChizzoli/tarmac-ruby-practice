@@ -1,3 +1,5 @@
+require './utils/status_codes'
+
 class TarmacMiddleware
 
   TARMAC_HEADER = 'TARMAC_HEADER'
@@ -10,7 +12,7 @@ class TarmacMiddleware
     if env["HTTP_TARMAC_HEADER"] == TARMAC_HEADER
       @app.call(env)
     else
-      Rack::Response.new(['Tarmac Header Not Present'], 401, {}).finish
+      Rack::Response.new(['Tarmac Header Not Present'], StatusCodes::STATUS_UNAUTHORIZED , {}).finish
     end
   end
 end
