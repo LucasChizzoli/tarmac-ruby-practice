@@ -52,7 +52,8 @@ put '/books/:id' do |id|
   @book = Book.where(id: id).first
   halt(StatusCodes::STATUS_NOT_FOUND, { message: 'Book Not Found' }.to_json) unless @book
   if @book.update_attributes(Parser.parse(request.body.read))
-    @book
+    status StatusCodes::STATUS_OK
+    return @book.id.to_json
   else
     status StatusCodes::STATUS_UNPROCESSABLE_ENTITY
     @book
