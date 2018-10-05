@@ -14,9 +14,11 @@ DEFAULT_PAGE = 1
 DEFAULT_LIMIT = 5
 
 get '/books' do 
+  build_book_model(params)
   @page = params[:page] || DEFAULT_PAGE
   @limit = params[:limit] || DEFAULT_LIMIT
-  @books = Book.paginate(:page => @page, :per_page => @limit)
+  @query = get_book_query(build_book_model(params))
+  @books = Book.where(@query).paginate(:page => @page, :per_page => @limit)
   {
     page: @page,
     limit: @limit,
@@ -26,7 +28,6 @@ end
   
 post '/books' do
   @book = Book.new(Parser.parse(request.body.read))
-  puts @book
   halt(StatusCodes::STATUS_BAD_REQUEST, { message: 'Invalid Data' }.to_json ) unless BookValidation.validate(@book)
   if @book.save
     status StatusCodes::STATUS_OK
@@ -58,4 +59,34 @@ put '/books/:id' do |id|
     status StatusCodes::STATUS_UNPROCESSABLE_ENTITY
     @book
   end
+end
+
+def build_book_model(params)
+  {
+    "isbn" => params['isbn'],
+    "title" => params['title'],
+    "publisher" => params['publisher'], 
+    "releasedate" => params['releasedate'],
+    "website" => params['website']
+  }
+end
+
+def get_book_query(book)
+  @query = {}
+  if book['title'] && book['title'].strip != '' then
+    @query['title'] = book['title']
+  end
+  if book['publisher'] && book['publisher'].strip != '' then
+    @query['publisher'] = book['publisher']
+  end
+  if book['website'] && book['website'].strip != '' then
+    @query['website'] = book['website']
+  end
+  if book['releasedate'] && book['releasedate'].strip != '' then
+    @query['releasedate'] = book['releasedate']
+  end
+  if book['isbn'] && book['isbn'].strip != '' then
+    @query['isbn'] = book['isbn']
+  end
+  @query
 end
