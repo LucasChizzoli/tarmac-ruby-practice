@@ -14,17 +14,16 @@ RSpec.describe 'Book Controller' do
 
   BOOKS_URL = '/books'
   
-    let(:book_mock) {
-      {
-        "isbn" => "1230091823471",
-        "title" => "Test book",
-        "publisher" => "Test publisher", 
-        "releasedate" => "01/01/2018",
-        "website" => "https://goodreads.com/"
-      }.to_json
-    }
+  let(:book_mock) {
+    {
+      "isbn" => "1230091823471",
+      "title" => "Test book",
+      "publisher" => "Test publisher", 
+      "releasedate" => "01/01/2018",
+      "website" => "https://goodreads.com/"
+    }.to_json
+  }
   
-
   describe '/books' do
 
     it 'returns HTTP status 200' do
